@@ -1,0 +1,16 @@
+{
+  "name": "zizmor-slsa-report",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A before-and-after security report for GitHub Actions, powered by zizmor.",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
