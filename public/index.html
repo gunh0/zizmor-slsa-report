@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="zizmor 분석 결과를 수정 전후로 비교하는 GitHub Actions 보안 리포트" />
+    <title>Prism — zizmor security report</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Prism 홈">
+        <span class="brand-mark">P</span>
+        <span>PRISM</span>
+      </a>
+      <nav aria-label="주요 메뉴">
+        <a href="#overview">Overview</a>
+        <a href="#findings">Findings</a>
+        <a href="#changes">Changes</a>
+      </nav>
+      <a class="github-link" href="https://github.com/zizmorcore/zizmor" target="_blank" rel="noreferrer">Powered by zizmor ↗</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow"><span></span> GITHUB ACTIONS SECURITY</div>
+        <h1>See what changed.<br /><em>Prove what improved.</em></h1>
+        <p class="hero-copy">공개 저장소의 CI/CD 보안 상태를 스캔하고, zizmor의 안전한 자동 수정 전후를 하나의 리포트에서 비교합니다.</p>
+
+        <form id="scan-form" class="scan-form">
+          <label for="repository">Repository</label>
+          <div class="input-row">
+            <span class="input-prefix">github.com/</span>
+            <input id="repository" name="repository" autocomplete="off" spellcheck="false" placeholder="owner/repository" aria-describedby="form-help" />
+            <button type="submit"><span>Run analysis</span><span aria-hidden="true">→</span></button>
+          </div>
+          <div class="form-meta">
+            <span id="form-help">Public repositories only · Safe fixes only</span>
+            <button type="button" id="demo-button" class="text-button">Load example report</button>
+          </div>
+        </form>
+        <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+      </section>
+
+      <section id="report" class="report" hidden>
+        <div class="report-heading" id="overview">
+          <div>
+            <div class="eyebrow"><span></span> ANALYSIS COMPLETE</div>
+            <h2 id="repo-name">Repository</h2>
+          </div>
+          <div class="report-meta">
+            <span id="generated-at">—</span>
+            <span id="version">—</span>
+          </div>
+        </div>
+
+        <div class="score-grid">
+          <article class="score-card before-card">
+            <div class="card-label"><span class="status-dot red"></span>Before</div>
+            <div class="score-main"><strong id="before-total">0</strong><span>findings</span></div>
+            <div id="before-bars" class="severity-bars"></div>
+          </article>
+          <div class="delta-card">
+            <span class="delta-arrow">→</span>
+            <strong id="improvement">0%</strong>
+            <span>risk reduction</span>
+            <small id="resolved">0 findings resolved</small>
+          </div>
+          <article class="score-card after-card">
+            <div class="card-label"><span class="status-dot green"></span>After safe fixes</div>
+            <div class="score-main"><strong id="after-total">0</strong><span>findings</span></div>
+            <div id="after-bars" class="severity-bars"></div>
+          </article>
+        </div>
+
+        <section id="findings" class="panel findings-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="section-index">01</span>
+              <h3>Security findings</h3>
+            </div>
+            <div class="segmented" role="group" aria-label="결과 선택">
+              <button class="active" data-view="before">Before <span id="before-count">0</span></button>
+              <button data-view="after">After <span id="after-count">0</span></button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Severity</th><th>Audit</th><th>Location</th><th>Confidence</th><th></th></tr></thead>
+              <tbody id="findings-body"></tbody>
+            </table>
+          </div>
+          <div id="empty-state" class="empty-state" hidden>No findings in this view. The workflow is clean.</div>
+        </section>
+
+        <section id="changes" class="panel changes-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="section-index">02</span>
+              <h3>Applied changes</h3>
+            </div>
+            <button id="copy-diff" class="text-button">Copy diff</button>
+          </div>
+          <pre><code id="diff-output">No safe fixes were applied.</code></pre>
+        </section>
+
+        <footer class="report-footer">
+          <p>Static analysis is evidence, not a guarantee. Review every change before merging.</p>
+          <span id="duration">—</span>
+        </footer>
+      </section>
+    </main>
+
+    <div id="loader" class="loader" hidden aria-live="assertive">
+      <div class="loader-box">
+        <div class="scan-line"></div>
+        <span class="loader-mark">P</span>
+        <strong>Inspecting workflows</strong>
+        <p id="loader-copy">Cloning repository…</p>
+      </div>
+    </div>
+  </body>
+</html>
