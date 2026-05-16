@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap');
-
 :root {
   --ink: #171814;
   --muted: #6d6e65;
@@ -10,8 +8,8 @@
   --red: #ff624d;
   --amber: #ffb82e;
   --green: #2c9b69;
-  --mono: "DM Mono", monospace;
-  --sans: "Manrope", sans-serif;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }

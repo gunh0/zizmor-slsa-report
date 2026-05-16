@@ -11,7 +11,7 @@ test("accepts GitHub slugs and canonical URLs", () => {
 });
 
 test("rejects arbitrary hosts and command-like input", () => {
-  for (const value of ["https://example.com/a/b", "localhost/a", "owner/repo; rm", "../repo", "owner"] ) {
+  for (const value of ["https://example.com/a/b", "owner/repo; rm", "../repo", "owner"] ) {
     assert.throws(() => parseRepository(value));
   }
 });

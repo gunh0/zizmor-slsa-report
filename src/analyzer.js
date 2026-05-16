@@ -78,14 +78,14 @@ export async function analyzeRepository(input) {
     // Safe mode intentionally excludes fixes that require semantic review.
     await run(process.env.ZIZMOR_BIN || "zizmor", ["--fix=safe", "--no-progress", "."], { cwd: repoPath });
     const after = await zizmor(["--format=json-v1", "--no-progress", "."], repoPath);
-    const diffResult = await run("git", ["diff", "--", ".github", ".pre-commit-config.yaml", ".pre-commit-config.yml"], { cwd: repoPath });
+    const diffResult = await run("git", ["diff", "--", "."], { cwd: repoPath });
 
     return buildReport({
       repository: repository.slug,
       version,
       before,
       after,
-      diff: diffResult.stdout,
+      diff: diffResult.stdout.slice(0, 250_000),
       durationMs: Date.now() - startedAt,
     });
   } finally {

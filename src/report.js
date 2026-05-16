@@ -14,8 +14,8 @@ function symbolicPath(location = {}) {
 }
 
 function concretePosition(location = {}) {
-  const concrete = location.concrete ?? location.symbolic?.location ?? {};
-  const start = concrete.start ?? concrete.span?.start ?? {};
+  const concrete = location.concrete ?? {};
+  const start = concrete.location?.start_point ?? concrete.start ?? concrete.span?.start ?? {};
   return {
     line: Number(start.row ?? concrete.row ?? 0) + 1,
     column: Number(start.column ?? concrete.column ?? 0) + 1,
@@ -25,7 +25,10 @@ function concretePosition(location = {}) {
 export function normalizeFinding(finding, index = 0) {
   const determinations = finding.determinations ?? {};
   const locations = Array.isArray(finding.locations) ? finding.locations : [];
-  const primary = locations.find((item) => symbolicPath(item)) ?? locations[0] ?? {};
+  const primary = locations.find((item) => String(item?.symbolic?.kind).toLowerCase() === "primary")
+    ?? locations.find((item) => symbolicPath(item))
+    ?? locations[0]
+    ?? {};
   const position = concretePosition(primary);
   const severity = String(determinations.severity ?? finding.severity ?? "unknown").toLowerCase();
   const confidence = String(determinations.confidence ?? finding.confidence ?? "unknown").toLowerCase();

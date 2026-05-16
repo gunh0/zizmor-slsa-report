@@ -8,8 +8,8 @@ const rawFinding = {
   url: "https://example.test/rule",
   determinations: { severity: "High", confidence: "Medium", persona: "Regular" },
   locations: [{
-    symbolic: { key: { Local: { verbatim_path: ".github/workflows/ci.yml" } } },
-    concrete: { start: { row: 4, column: 2 } },
+    symbolic: { key: { Local: { verbatim_path: ".github/workflows/ci.yml" } }, kind: "Primary" },
+    concrete: { location: { start_point: { row: 4, column: 2 } } },
   }],
 };
 
