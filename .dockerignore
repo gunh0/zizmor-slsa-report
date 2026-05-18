@@ -1,0 +1,6 @@
+.git
+.github
+node_modules
+test
+coverage
+npm-debug.log*

@@ -8,6 +8,7 @@ import { createDemoReport } from "./src/demo.js";
 
 const root = fileURLToPath(new URL("./public", import.meta.url));
 const port = Number(process.env.PORT || 4173);
+const host = process.env.HOST || "127.0.0.1";
 const maxBody = 16 * 1024;
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
@@ -83,8 +84,8 @@ const server = createServer(async (request, response) => {
 });
 
 if (process.env.NODE_ENV !== "test") {
-  server.listen(port, "127.0.0.1", () => {
-    console.log(`zizmor report is running at http://127.0.0.1:${port}`);
+  server.listen(port, host, () => {
+    console.log(`zizmor report is running at http://${host}:${port}`);
   });
 }
 
