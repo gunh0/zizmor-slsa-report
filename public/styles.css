@@ -49,6 +49,8 @@ h1 em { font-family: Georgia, serif; font-weight: 400; }
 .report { padding: 80px 0 110px; border-top: 1px solid var(--line); }
 .report-heading { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 34px; }
 .report-heading h2 { font-size: clamp(32px, 5vw, 54px); letter-spacing: -.045em; margin: 14px 0 0; }
+.report-side { display: flex; flex-direction: column; align-items: flex-end; gap: 18px; }
+.report-actions { display: flex; gap: 18px; }
 .report-meta { display: flex; gap: 16px; color: var(--muted); font: 10px var(--mono); }
 .report-meta span { padding-left: 16px; border-left: 1px solid var(--line); }
 .score-grid { display: grid; grid-template-columns: 1fr 190px 1fr; border: 1px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); background: var(--panel); margin-bottom: 70px; }
@@ -106,5 +108,11 @@ tbody tr:hover { background: #f4f8e9; }
   main { width: min(100% - 28px, 1180px); }.hero { padding: 70px 0; min-height: 570px; }.hero::after { display: none; }
   .input-row { height: auto; flex-wrap: wrap; }.input-prefix { height: 56px; }.input-row input { height: 56px; }.input-row button { width: 100%; height: 52px; }
   .form-meta { gap: 18px; }.score-grid { grid-template-columns: 1fr 110px; }.score-card { padding: 22px; }.after-card { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); }.delta-card { grid-column: 2; grid-row: 1; }.before-card { border-right: 1px solid var(--line); }
-  .report-heading, .report-footer { align-items: flex-start; flex-direction: column; gap: 18px; }.report-meta { flex-direction: column; gap: 5px; }
+  .report-heading, .report-footer { align-items: flex-start; flex-direction: column; gap: 18px; }.report-side { align-items: flex-start; }.report-meta { flex-direction: column; gap: 5px; }
+}
+
+@media print {
+  .topbar, .hero, .report-actions, .noise { display: none !important; }
+  body { background: white; }.report { border: 0; padding: 20px 0; }.score-grid { box-shadow: none; }
+  .panel { break-inside: avoid; }.changes-panel pre { max-height: none; white-space: pre-wrap; }
 }

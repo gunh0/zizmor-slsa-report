@@ -140,3 +140,14 @@ document.querySelector("#copy-diff").addEventListener("click", async (event) => 
   button.textContent = "Copied";
   setTimeout(() => { button.textContent = original; }, 1200);
 });
+document.querySelector("#download-report").addEventListener("click", () => {
+  if (!report) return;
+  const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `${report.repository.replace("/", "-")}-zizmor-report.json`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+});
+document.querySelector("#print-report").addEventListener("click", () => window.print());
