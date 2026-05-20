@@ -10,6 +10,8 @@ const root = fileURLToPath(new URL("./public", import.meta.url));
 const port = Number(process.env.PORT || 4173);
 const host = process.env.HOST || "127.0.0.1";
 const maxBody = 16 * 1024;
+const maxConcurrentAnalyses = Number(process.env.MAX_CONCURRENT_ANALYSES || 2);
+let activeAnalyses = 0;
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -68,9 +70,18 @@ const server = createServer(async (request, response) => {
       return json(response, 200, createDemoReport());
     }
     if (request.method === "POST" && url.pathname === "/api/analyze") {
+      if (activeAnalyses >= maxConcurrentAnalyses) {
+        response.setHeader("retry-after", "10");
+        return json(response, 429, { error: "분석 요청이 처리 중입니다. 잠시 후 다시 시도해 주세요." });
+      }
       const payload = await body(request);
-      const report = await analyzeRepository(payload.repository);
-      return json(response, 200, report);
+      activeAnalyses += 1;
+      try {
+        const report = await analyzeRepository(payload.repository);
+        return json(response, 200, report);
+      } finally {
+        activeAnalyses -= 1;
+      }
     }
     if (request.method === "GET" && await staticFile(url.pathname, response)) return;
     json(response, 404, { error: "요청한 경로를 찾을 수 없습니다." });

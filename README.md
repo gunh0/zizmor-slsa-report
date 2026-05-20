@@ -36,6 +36,8 @@ Open <http://127.0.0.1:4173>. Set `PORT` to use another port, or `ZIZMOR_BIN` wh
 PORT=8080 ZIZMOR_BIN=/opt/bin/zizmor npm start
 ```
 
+`MAX_CONCURRENT_ANALYSES` controls simultaneous scans and defaults to `2`.
+
 No npm dependencies or build step are required.
 
 ## Container
