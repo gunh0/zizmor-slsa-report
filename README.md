@@ -66,6 +66,16 @@ npm run dev
 npm test
 ```
 
+Or use the included Makefile:
+
+```bash
+make help
+make dev
+make check
+make docker-build
+make docker-run PORT=8080
+```
+
 Prism consumes zizmor's versioned `json-v1` output. JSON rows are zero-based, so the report converts them to conventional one-based line numbers.
 
 ## License
