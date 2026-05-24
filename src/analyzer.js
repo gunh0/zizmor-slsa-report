@@ -17,7 +17,7 @@ export function parseRepository(input) {
 
   slug = slug.replace(/^\/+|\/+$/g, "");
   if (!OWNER_REPO.test(slug)) {
-    throw new Error("GitHub 저장소를 owner/repo 또는 https://github.com/owner/repo 형식으로 입력해 주세요.");
+    throw new Error("Enter a GitHub repository as owner/repo or https://github.com/owner/repo.");
   }
 
   return { slug, url: `https://github.com/${slug}.git` };
@@ -42,7 +42,7 @@ function run(command, args, options = {}) {
     });
     child.on("close", (code, signal) => {
       clearTimeout(timer);
-      if (signal) return reject(new Error(`${command} 실행 시간이 초과되었습니다.`));
+      if (signal) return reject(new Error(`${command} timed out.`));
       resolve({ code, stdout, stderr });
     });
   });
@@ -53,7 +53,7 @@ async function zizmor(args, cwd) {
   const result = await run(binary, args, { cwd });
   // zizmor uses 10+ exit codes to communicate findings; valid JSON is authoritative.
   if (!result.stdout.trim().startsWith("[")) {
-    throw new Error(result.stderr.trim() || "zizmor가 유효한 JSON 결과를 반환하지 않았습니다.");
+    throw new Error(result.stderr.trim() || "zizmor did not return valid JSON output.");
   }
   return parseZizmorJson(result.stdout);
 }

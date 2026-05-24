@@ -22,7 +22,7 @@ function escapeHtml(value) {
 
 function formatDate(value) {
   return new Intl.DateTimeFormat("ko-KR", {
-    dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Seoul",
+    dateStyle: "medium", timeStyle: "short", timeZone: "UTC",
   }).format(new Date(value));
 }
 
@@ -42,7 +42,7 @@ function renderFindings() {
       <td class="audit-name"><strong>${escapeHtml(finding.rule)}</strong><span>${escapeHtml(finding.title)}</span></td>
       <td class="location">${escapeHtml(finding.path)}:${finding.line}</td>
       <td class="confidence">${escapeHtml(finding.confidence)}</td>
-      <td>${finding.url ? `<a class="finding-link" href="${escapeHtml(finding.url)}" target="_blank" rel="noreferrer" aria-label="감사 규칙 문서 열기">↗</a>` : ""}</td>
+      <td>${finding.url ? `<a class="finding-link" href="${escapeHtml(finding.url)}" target="_blank" rel="noreferrer" aria-label="Open audit rule documentation">↗</a>` : ""}</td>
     </tr>`).join("");
   elements.emptyState.hidden = findings.length > 0;
   document.querySelectorAll("[data-view]").forEach((button) => {
@@ -101,7 +101,7 @@ async function requestReport(url, options) {
   try {
     const response = await fetch(url, options);
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "리포트를 생성하지 못했습니다.");
+    if (!response.ok) throw new Error(data.error || "The report could not be generated.");
     render(data);
   } catch (error) {
     elements.notice.textContent = error.message;
@@ -115,7 +115,7 @@ elements.form.addEventListener("submit", (event) => {
   event.preventDefault();
   const repository = elements.repository.value.trim();
   if (!repository) {
-    elements.notice.textContent = "분석할 GitHub 저장소를 입력해 주세요.";
+    elements.notice.textContent = "Enter a GitHub repository to analyze.";
     elements.notice.hidden = false;
     return;
   }

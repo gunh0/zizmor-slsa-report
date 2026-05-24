@@ -33,7 +33,7 @@ async function body(request) {
   let raw = "";
   for await (const chunk of request) {
     raw += chunk;
-    if (raw.length > maxBody) throw new Error("요청 본문이 너무 큽니다.");
+    if (raw.length > maxBody) throw new Error("Request body is too large.");
   }
   return JSON.parse(raw || "{}");
 }
@@ -72,7 +72,7 @@ const server = createServer(async (request, response) => {
     if (request.method === "POST" && url.pathname === "/api/analyze") {
       if (activeAnalyses >= maxConcurrentAnalyses) {
         response.setHeader("retry-after", "10");
-        return json(response, 429, { error: "분석 요청이 처리 중입니다. 잠시 후 다시 시도해 주세요." });
+        return json(response, 429, { error: "The analyzer is busy. Please try again shortly." });
       }
       const payload = await body(request);
       activeAnalyses += 1;
@@ -84,12 +84,12 @@ const server = createServer(async (request, response) => {
       }
     }
     if (request.method === "GET" && await staticFile(url.pathname, response)) return;
-    json(response, 404, { error: "요청한 경로를 찾을 수 없습니다." });
+    json(response, 404, { error: "The requested route was not found." });
   } catch (error) {
     const missingZizmor = error?.code === "ENOENT" && (error?.path === "zizmor" || error?.syscall?.includes("spawn zizmor"));
     const message = missingZizmor
-      ? "zizmor 실행 파일을 찾을 수 없습니다. 설치 후 서버를 다시 시작해 주세요."
-      : error.message || "분석 중 오류가 발생했습니다.";
+      ? "The zizmor executable was not found. Install it and restart the server."
+      : error.message || "An unexpected error occurred during analysis.";
     json(response, missingZizmor ? 503 : 400, { error: message });
   }
 });

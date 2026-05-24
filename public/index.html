@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="zizmor 분석 결과를 수정 전후로 비교하는 GitHub Actions 보안 리포트" />
+    <meta name="description" content="Compare GitHub Actions security findings before and after zizmor safe fixes." />
     <title>Prism — zizmor security report</title>
     <link rel="stylesheet" href="/styles.css" />
     <script type="module" src="/app.js"></script>
@@ -11,11 +11,11 @@
   <body>
     <div class="noise" aria-hidden="true"></div>
     <header class="topbar">
-      <a class="brand" href="/" aria-label="Prism 홈">
+      <a class="brand" href="/" aria-label="Prism home">
         <span class="brand-mark">P</span>
         <span>PRISM</span>
       </a>
-      <nav aria-label="주요 메뉴">
+      <nav aria-label="Primary navigation">
         <a href="#overview">Overview</a>
         <a href="#findings">Findings</a>
         <a href="#changes">Changes</a>
@@ -27,7 +27,7 @@
       <section class="hero">
         <div class="eyebrow"><span></span> GITHUB ACTIONS SECURITY</div>
         <h1>See what changed.<br /><em>Prove what improved.</em></h1>
-        <p class="hero-copy">공개 저장소의 CI/CD 보안 상태를 스캔하고, zizmor의 안전한 자동 수정 전후를 하나의 리포트에서 비교합니다.</p>
+        <p class="hero-copy">Scan a public repository's CI/CD security posture and compare the results before and after zizmor's safe automatic fixes.</p>
 
         <form id="scan-form" class="scan-form">
           <label for="repository">Repository</label>
@@ -87,7 +87,7 @@
               <span class="section-index">01</span>
               <h3>Security findings</h3>
             </div>
-            <div class="segmented" role="group" aria-label="결과 선택">
+            <div class="segmented" role="group" aria-label="Select result set">
               <button class="active" data-view="before">Before <span id="before-count">0</span></button>
               <button data-view="after">After <span id="after-count">0</span></button>
             </div>
