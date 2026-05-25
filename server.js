@@ -88,7 +88,7 @@ const server = createServer(async (request, response) => {
   } catch (error) {
     const missingZizmor = error?.code === "ENOENT" && (error?.path === "zizmor" || error?.syscall?.includes("spawn zizmor"));
     const message = missingZizmor
-      ? "The zizmor executable was not found. Install it and restart the server."
+      ? "The zizmor executable was not found. Run `make setup`, then restart the server."
       : error.message || "An unexpected error occurred during analysis.";
     json(response, missingZizmor ? 503 : 400, { error: message });
   }

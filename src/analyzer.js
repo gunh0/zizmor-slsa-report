@@ -1,12 +1,19 @@
 import { execFile, spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { buildReport, parseZizmorJson } from "./report.js";
 
 const execFileAsync = promisify(execFile);
 const OWNER_REPO = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})\/[A-Za-z0-9._-]{1,100}$/;
+const localZizmor = fileURLToPath(new URL("../.tools/zizmor", import.meta.url));
+
+function zizmorBinary() {
+  return process.env.ZIZMOR_BIN || (existsSync(localZizmor) ? localZizmor : "zizmor");
+}
 
 export function parseRepository(input) {
   const value = String(input ?? "").trim().replace(/\.git$/, "");
@@ -49,7 +56,7 @@ function run(command, args, options = {}) {
 }
 
 async function zizmor(args, cwd) {
-  const binary = process.env.ZIZMOR_BIN || "zizmor";
+  const binary = zizmorBinary();
   const result = await run(binary, args, { cwd });
   // zizmor uses 10+ exit codes to communicate findings; valid JSON is authoritative.
   if (!result.stdout.trim().startsWith("[")) {
@@ -71,12 +78,12 @@ export async function analyzeRepository(input) {
       env: { ...process.env, GIT_TERMINAL_PROMPT: "0" },
     });
 
-    const versionResult = await run(process.env.ZIZMOR_BIN || "zizmor", ["--version"], { cwd: repoPath, timeout: 10_000 });
+    const versionResult = await run(zizmorBinary(), ["--version"], { cwd: repoPath, timeout: 10_000 });
     const version = versionResult.stdout.trim() || versionResult.stderr.trim() || "unknown";
     const before = await zizmor(["--format=json-v1", "--no-progress", "."], repoPath);
 
     // Safe mode intentionally excludes fixes that require semantic review.
-    await run(process.env.ZIZMOR_BIN || "zizmor", ["--fix=safe", "--no-progress", "."], { cwd: repoPath });
+    await run(zizmorBinary(), ["--fix=safe", "--no-progress", "."], { cwd: repoPath });
     const after = await zizmor(["--format=json-v1", "--no-progress", "."], repoPath);
     const diffResult = await run("git", ["diff", "--", "."], { cwd: repoPath });
 

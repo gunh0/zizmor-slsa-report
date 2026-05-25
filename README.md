@@ -27,7 +27,8 @@ uv tool install zizmor
 ## Run locally
 
 ```bash
-npm start
+make setup
+make start
 ```
 
 Open <http://127.0.0.1:4173>. Set `PORT` to use another port, or `ZIZMOR_BIN` when the executable is not on `PATH`.
@@ -66,10 +67,11 @@ npm run dev
 npm test
 ```
 
-Or use the included Makefile:
+Use the included Makefile to install the project-local zizmor binary and run development tasks:
 
 ```bash
 make help
+make setup
 make dev
 make check
 make docker-build
