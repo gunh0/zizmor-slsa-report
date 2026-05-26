@@ -42,6 +42,18 @@ test("builds a before-and-after delta", () => {
   assert.equal(report.delta.improvement, 50);
 });
 
+test("marks reports with no auditable inputs", () => {
+  const report = buildReport({
+    repository: "owner/repo",
+    version: "1.0",
+    before: [],
+    after: [],
+    auditableInputs: false,
+  });
+  assert.equal(report.audit.performed, false);
+  assert.match(report.audit.message, /No auditable/);
+});
+
 test("rejects non-array zizmor output", () => {
   assert.throws(() => parseZizmorJson("{}"), /must be an array/);
 });

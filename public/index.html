@@ -40,6 +40,14 @@
             <span id="form-help">Public repositories only · Safe fixes only</span>
             <button type="button" id="demo-button" class="text-button">Load example report</button>
           </div>
+          <div class="presets" aria-label="Example open-source repositories">
+            <span>Try a repository</span>
+            <button type="button" data-repository="zizmorcore/zizmor">zizmor</button>
+            <button type="button" data-repository="cli/cli">GitHub CLI</button>
+            <button type="button" data-repository="actions/checkout">Actions Checkout</button>
+            <button type="button" data-repository="ossf/scorecard">OpenSSF Scorecard</button>
+            <button type="button" data-repository="astral-sh/uv">uv</button>
+          </div>
         </form>
         <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
       </section>
@@ -61,6 +69,7 @@
             </div>
           </div>
         </div>
+        <div id="audit-state" class="audit-state" hidden></div>
 
         <div class="score-grid">
           <article class="score-card before-card">

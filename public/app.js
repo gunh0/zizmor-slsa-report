@@ -67,6 +67,9 @@ function render(nextReport) {
   document.querySelector("#repo-name").textContent = report.repository;
   document.querySelector("#generated-at").textContent = formatDate(report.generatedAt);
   document.querySelector("#version").textContent = report.version;
+  const auditState = document.querySelector("#audit-state");
+  auditState.hidden = report.audit?.performed !== false;
+  auditState.textContent = report.audit?.message || "";
   document.querySelector("#before-total").textContent = report.before.summary.total;
   document.querySelector("#after-total").textContent = report.after.summary.total;
   document.querySelector("#before-count").textContent = report.before.summary.total;
@@ -127,6 +130,16 @@ elements.form.addEventListener("submit", (event) => {
 });
 
 elements.demo.addEventListener("click", () => requestReport("/api/demo"));
+document.querySelectorAll("[data-repository]").forEach((button) => {
+  button.addEventListener("click", () => {
+    elements.repository.value = button.dataset.repository;
+    requestReport("/api/analyze", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ repository: button.dataset.repository }),
+    });
+  });
+});
 document.querySelectorAll("[data-view]").forEach((button) => {
   button.addEventListener("click", () => {
     activeView = button.dataset.view;

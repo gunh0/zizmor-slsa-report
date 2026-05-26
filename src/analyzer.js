@@ -58,11 +58,14 @@ function run(command, args, options = {}) {
 async function zizmor(args, cwd) {
   const binary = zizmorBinary();
   const result = await run(binary, args, { cwd });
+  if (result.code === 3 || /no inputs collected/i.test(`${result.stdout}\n${result.stderr}`)) {
+    return { findings: [], noInputs: true };
+  }
   // zizmor uses 10+ exit codes to communicate findings; valid JSON is authoritative.
   if (!result.stdout.trim().startsWith("[")) {
     throw new Error(result.stderr.trim() || "zizmor did not return valid JSON output.");
   }
-  return parseZizmorJson(result.stdout);
+  return { findings: parseZizmorJson(result.stdout), noInputs: false };
 }
 
 export async function analyzeRepository(input) {
@@ -80,18 +83,29 @@ export async function analyzeRepository(input) {
 
     const versionResult = await run(zizmorBinary(), ["--version"], { cwd: repoPath, timeout: 10_000 });
     const version = versionResult.stdout.trim() || versionResult.stderr.trim() || "unknown";
-    const before = await zizmor(["--format=json-v1", "--no-progress", "."], repoPath);
+    const beforeRun = await zizmor(["--format=json-v1", "--no-progress", "."], repoPath);
+
+    if (beforeRun.noInputs) {
+      return buildReport({
+        repository: repository.slug,
+        version,
+        before: [],
+        after: [],
+        durationMs: Date.now() - startedAt,
+        auditableInputs: false,
+      });
+    }
 
     // Safe mode intentionally excludes fixes that require semantic review.
     await run(zizmorBinary(), ["--fix=safe", "--no-progress", "."], { cwd: repoPath });
-    const after = await zizmor(["--format=json-v1", "--no-progress", "."], repoPath);
+    const afterRun = await zizmor(["--format=json-v1", "--no-progress", "."], repoPath);
     const diffResult = await run("git", ["diff", "--", "."], { cwd: repoPath });
 
     return buildReport({
       repository: repository.slug,
       version,
-      before,
-      after,
+      before: beforeRun.findings,
+      after: afterRun.findings,
       diff: diffResult.stdout.slice(0, 250_000),
       durationMs: Date.now() - startedAt,
     });

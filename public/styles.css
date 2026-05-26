@@ -44,6 +44,10 @@ h1 em { font-family: Georgia, serif; font-weight: 400; }
 .input-row button:hover { background: #32342d; }
 .form-meta { display: flex; justify-content: space-between; color: var(--muted); font: 10px var(--mono); margin-top: 16px; }
 .text-button { border: 0; border-bottom: 1px solid currentColor; padding: 0 0 2px; background: none; color: var(--ink); cursor: pointer; font: 500 10px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+.presets { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+.presets > span { margin-right: 4px; color: var(--muted); font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+.presets button { border: 1px solid var(--line); background: transparent; color: var(--ink); padding: 8px 11px; cursor: pointer; font: 10px var(--mono); transition: background .15s, border-color .15s, transform .15s; }
+.presets button:hover, .presets button:focus-visible { border-color: var(--ink); background: var(--acid); transform: translateY(-1px); outline: none; }
 .notice { max-width: 850px; margin-top: 28px; padding: 14px 18px; border-left: 3px solid var(--red); background: #ffe7e1; font-size: 13px; }
 
 .report { padding: 80px 0 110px; border-top: 1px solid var(--line); }
@@ -53,6 +57,7 @@ h1 em { font-family: Georgia, serif; font-weight: 400; }
 .report-actions { display: flex; gap: 18px; }
 .report-meta { display: flex; gap: 16px; color: var(--muted); font: 10px var(--mono); }
 .report-meta span { padding-left: 16px; border-left: 1px solid var(--line); }
+.audit-state { margin: -8px 0 30px; padding: 16px 18px; border: 1px solid #b6a46a; background: #fff3c9; font: 11px/1.6 var(--mono); }
 .score-grid { display: grid; grid-template-columns: 1fr 190px 1fr; border: 1px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); background: var(--panel); margin-bottom: 70px; }
 .score-card { padding: 30px; }
 .before-card { border-right: 1px solid var(--line); }

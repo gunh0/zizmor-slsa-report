@@ -53,7 +53,7 @@ export function summarize(findings = []) {
   return { total: findings.length, ...counts };
 }
 
-export function buildReport({ repository, version, before, after, diff = "", durationMs = 0, source = "live" }) {
+export function buildReport({ repository, version, before, after, diff = "", durationMs = 0, source = "live", auditableInputs = true }) {
   const normalizedBefore = before.map(normalizeFinding);
   const normalizedAfter = after.map(normalizeFinding);
   const beforeSummary = summarize(normalizedBefore);
@@ -65,6 +65,12 @@ export function buildReport({ repository, version, before, after, diff = "", dur
     generatedAt: new Date().toISOString(),
     durationMs,
     source,
+    audit: {
+      performed: auditableInputs,
+      message: auditableInputs
+        ? "Audit completed."
+        : "No auditable GitHub Actions, Dependabot, or pre-commit configuration was found.",
+    },
     before: { summary: beforeSummary, findings: normalizedBefore },
     after: { summary: afterSummary, findings: normalizedAfter },
     delta: {
