@@ -21,7 +21,7 @@ function escapeHtml(value) {
 }
 
 function formatDate(value) {
-  return new Intl.DateTimeFormat("ko-KR", {
+  return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium", timeStyle: "short", timeZone: "UTC",
   }).format(new Date(value));
 }
@@ -164,3 +164,7 @@ document.querySelector("#download-report").addEventListener("click", () => {
   URL.revokeObjectURL(url);
 });
 document.querySelector("#print-report").addEventListener("click", () => window.print());
+
+if (new URLSearchParams(window.location.search).get("demo") === "1") {
+  requestReport("/api/demo");
+}
