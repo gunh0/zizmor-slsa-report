@@ -1,6 +1,6 @@
-import { buildReport } from "./report.js";
+import { buildReport, type RawFinding, type Report } from "./report.js";
 
-const finding = (ident, desc, severity, confidence, path, row) => ({
+const finding = (ident: string, desc: string, severity: string, confidence: string, path: string, row: number): RawFinding => ({
   ident,
   desc,
   url: `https://docs.zizmor.sh/audits/#${ident}`,
@@ -11,7 +11,7 @@ const finding = (ident, desc, severity, confidence, path, row) => ({
   }],
 });
 
-export function createDemoReport() {
+export function createDemoReport(): Report {
   const before = [
     finding("template-injection", "code injection via template expansion", "High", "High", ".github/workflows/release.yml", 31),
     finding("excessive-permissions", "overly broad GitHub token permissions", "High", "High", ".github/workflows/ci.yml", 4),
@@ -22,7 +22,7 @@ export function createDemoReport() {
     finding("dangerous-triggers", "dangerous use of pull_request_target", "High", "High", ".github/workflows/triage.yml", 2),
     finding("stale-action-refs", "action reference is stale", "Low", "High", ".github/workflows/docs.yml", 16),
   ];
-  const after = [before[0], before[4], before[5], before[6]];
+  const after = [before[0]!, before[4]!, before[5]!, before[6]!];
 
   return buildReport({
     repository: "acme/checkout-service",

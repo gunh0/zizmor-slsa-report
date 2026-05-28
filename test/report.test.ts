@@ -31,7 +31,7 @@ test("normalizes zizmor v1 findings and converts rows to one-based lines", () =>
 test("summarizes findings by severity", () => {
   const findings = [
     { severity: "high" }, { severity: "high" }, { severity: "medium" }, { severity: "unknown" },
-  ];
+  ] as const;
   assert.deepEqual(summarize(findings), { total: 4, high: 2, medium: 1, low: 0, unknown: 1 });
 });
 

@@ -8,7 +8,7 @@ PORT ?= 4173
 ZIZMOR_VERSION ?= 1.30.1
 TOOLS_DIR ?= .tools
 
-.PHONY: help setup install install-zizmor dev start test check zizmor-check docker-build docker-run clean
+.PHONY: help setup install install-zizmor build dev start test typecheck check zizmor-check docker-build docker-run clean
 
 help: ## Show available commands
 	@awk 'BEGIN {FS = ":.*## "; printf "Usage: make \033[36m<target>\033[0m\n\n"} /^[a-zA-Z_-]+:.*## / {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -41,15 +41,19 @@ install-zizmor: ## Download zizmor into the project tool directory
 dev: ## Start the development server with file watching
 	npm run dev
 
+build: ## Compile the TypeScript server and browser application
+	npm run build
+
 start: ## Start the application
 	npm start
 
 test: ## Run the unit test suite
 	npm test
 
-check: test ## Run tests and JavaScript syntax checks
-	node --check server.js
-	node --check public/app.js
+typecheck: ## Run the TypeScript compiler without emitting files
+	npm run typecheck
+
+check: test typecheck build ## Run tests, type checks, and production builds
 
 zizmor-check: ## Verify the project-local zizmor installation
 	@test -x "$(TOOLS_DIR)/zizmor" || { echo "zizmor is not installed. Run: make setup"; exit 1; }
@@ -62,4 +66,4 @@ docker-run: ## Run the container on PORT (default: 4173)
 	docker run --rm -p $(PORT):4173 $(IMAGE):$(TAG)
 
 clean: ## Remove local test and debug artifacts
-	rm -rf coverage npm-debug.log*
+	rm -rf coverage dist public/app.js npm-debug.log*

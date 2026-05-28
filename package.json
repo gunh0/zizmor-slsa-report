@@ -5,12 +5,23 @@
   "description": "A before-and-after security report for GitHub Actions, powered by zizmor.",
   "type": "module",
   "scripts": {
-    "dev": "node --watch server.js",
-    "start": "node server.js",
-    "test": "node --test"
+    "build": "npm run build:server && npm run build:client",
+    "build:server": "tsc -p tsconfig.server.json",
+    "build:client": "esbuild src/client.ts --bundle --format=esm --target=es2022 --outfile=public/app.js",
+    "dev": "npm run build:client && concurrently -k 'esbuild src/client.ts --bundle --format=esm --target=es2022 --outfile=public/app.js --watch' 'tsx watch server.ts'",
+    "start": "npm run build && node dist/server.js",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "engines": {
     "node": ">=20"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "concurrently": "^9.2.1",
+    "esbuild": "^0.25.10",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2"
+  }
 }

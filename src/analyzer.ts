@@ -3,19 +3,40 @@ import { existsSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
-import { buildReport, parseZizmorJson } from "./report.js";
+import { buildReport, parseZizmorJson, type RawFinding, type Report } from "./report.js";
 
 const execFileAsync = promisify(execFile);
 const OWNER_REPO = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})\/[A-Za-z0-9._-]{1,100}$/;
-const localZizmor = fileURLToPath(new URL("../.tools/zizmor", import.meta.url));
+const localZizmor = join(process.cwd(), ".tools", "zizmor");
 
-function zizmorBinary() {
+interface Repository {
+  slug: string;
+  url: string;
+}
+
+interface RunOptions {
+  cwd?: string;
+  timeout?: number;
+  env?: NodeJS.ProcessEnv;
+}
+
+interface RunResult {
+  code: number | null;
+  stdout: string;
+  stderr: string;
+}
+
+interface ZizmorResult {
+  findings: RawFinding[];
+  noInputs: boolean;
+}
+
+function zizmorBinary(): string {
   return process.env.ZIZMOR_BIN || (existsSync(localZizmor) ? localZizmor : "zizmor");
 }
 
-export function parseRepository(input) {
+export function parseRepository(input: unknown): Repository {
   const value = String(input ?? "").trim().replace(/\.git$/, "");
   let slug = value;
 
@@ -30,9 +51,9 @@ export function parseRepository(input) {
   return { slug, url: `https://github.com/${slug}.git` };
 }
 
-function run(command, args, options = {}) {
+function run(command: string, args: string[], options: RunOptions = {}): Promise<RunResult> {
   const timeout = options.timeout ?? 120_000;
-  return new Promise((resolve, reject) => {
+  return new Promise<RunResult>((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd,
       env: { ...process.env, NO_COLOR: "1", ...options.env },
@@ -41,8 +62,8 @@ function run(command, args, options = {}) {
     let stdout = "";
     let stderr = "";
     const timer = setTimeout(() => child.kill("SIGKILL"), timeout);
-    child.stdout.on("data", (chunk) => { stdout += chunk; });
-    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.stdout.on("data", (chunk: Buffer) => { stdout += chunk.toString(); });
+    child.stderr.on("data", (chunk: Buffer) => { stderr += chunk.toString(); });
     child.on("error", (error) => {
       clearTimeout(timer);
       reject(error);
@@ -55,7 +76,7 @@ function run(command, args, options = {}) {
   });
 }
 
-async function zizmor(args, cwd) {
+async function zizmor(args: string[], cwd: string): Promise<ZizmorResult> {
   const binary = zizmorBinary();
   const result = await run(binary, args, { cwd });
   if (result.code === 3 || /no inputs collected/i.test(`${result.stdout}\n${result.stderr}`)) {
@@ -68,7 +89,7 @@ async function zizmor(args, cwd) {
   return { findings: parseZizmorJson(result.stdout), noInputs: false };
 }
 
-export async function analyzeRepository(input) {
+export async function analyzeRepository(input: unknown): Promise<Report> {
   const repository = parseRepository(input);
   const workspace = await mkdtemp(join(tmpdir(), "zizmor-report-"));
   const repoPath = join(workspace, "repository");

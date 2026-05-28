@@ -1,40 +1,48 @@
-const elements = {
-  form: document.querySelector("#scan-form"),
-  repository: document.querySelector("#repository"),
-  demo: document.querySelector("#demo-button"),
-  report: document.querySelector("#report"),
-  notice: document.querySelector("#notice"),
-  loader: document.querySelector("#loader"),
-  loaderCopy: document.querySelector("#loader-copy"),
-  findingsBody: document.querySelector("#findings-body"),
-  emptyState: document.querySelector("#empty-state"),
-};
+import type { Report, Severity, Summary } from "./report.js";
 
-let report = null;
-let activeView = "before";
-let loaderTimer;
-
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
-  })[character]);
+function query<T extends Element>(selector: string): T {
+  const element = document.querySelector<T>(selector);
+  if (!element) throw new Error(`Missing required element: ${selector}`);
+  return element;
 }
 
-function formatDate(value) {
+const elements = {
+  form: query<HTMLFormElement>("#scan-form"),
+  repository: query<HTMLInputElement>("#repository"),
+  demo: query<HTMLButtonElement>("#demo-button"),
+  report: query<HTMLElement>("#report"),
+  notice: query<HTMLElement>("#notice"),
+  loader: query<HTMLElement>("#loader"),
+  loaderCopy: query<HTMLElement>("#loader-copy"),
+  findingsBody: query<HTMLTableSectionElement>("#findings-body"),
+  emptyState: query<HTMLElement>("#empty-state"),
+};
+
+let report: Report | null = null;
+let activeView: "before" | "after" = "before";
+let loaderTimer: ReturnType<typeof setInterval> | undefined;
+
+function escapeHtml(value: unknown): string {
+  return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
+  })[character] ?? character);
+}
+
+function formatDate(value: string): string {
   return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium", timeStyle: "short", timeZone: "UTC",
   }).format(new Date(value));
 }
 
-function severityBars(summary) {
+function severityBars(summary: Summary): string {
   if (!summary.total) return '<span class="empty"></span>';
-  return ["high", "medium", "low", "unknown"]
+  return (["high", "medium", "low", "unknown"] as Severity[])
     .filter((level) => summary[level])
     .map((level) => `<span class="${level}" style="flex:${summary[level]}" title="${level}: ${summary[level]}"></span>`)
     .join("");
 }
 
-function renderFindings() {
+function renderFindings(): void {
   const findings = report?.[activeView]?.findings ?? [];
   elements.findingsBody.innerHTML = findings.map((finding) => `
     <tr>
@@ -45,12 +53,12 @@ function renderFindings() {
       <td>${finding.url ? `<a class="finding-link" href="${escapeHtml(finding.url)}" target="_blank" rel="noreferrer" aria-label="Open audit rule documentation">↗</a>` : ""}</td>
     </tr>`).join("");
   elements.emptyState.hidden = findings.length > 0;
-  document.querySelectorAll("[data-view]").forEach((button) => {
+  document.querySelectorAll<HTMLButtonElement>("[data-view]").forEach((button) => {
     button.classList.toggle("active", button.dataset.view === activeView);
   });
 }
 
-function highlightDiff(diff) {
+function highlightDiff(diff: string): string {
   return escapeHtml(diff || "No safe fixes were applied.")
     .split("\n")
     .map((line) => {
@@ -61,53 +69,56 @@ function highlightDiff(diff) {
     }).join("\n");
 }
 
-function render(nextReport) {
+function render(nextReport: Report): void {
   report = nextReport;
   activeView = "before";
-  document.querySelector("#repo-name").textContent = report.repository;
-  document.querySelector("#generated-at").textContent = formatDate(report.generatedAt);
-  document.querySelector("#version").textContent = report.version;
-  const auditState = document.querySelector("#audit-state");
+  query("#repo-name").textContent = report.repository;
+  query("#generated-at").textContent = formatDate(report.generatedAt);
+  query("#version").textContent = report.version;
+  const auditState = query<HTMLElement>("#audit-state");
   auditState.hidden = report.audit?.performed !== false;
   auditState.textContent = report.audit?.message || "";
-  document.querySelector("#before-total").textContent = report.before.summary.total;
-  document.querySelector("#after-total").textContent = report.after.summary.total;
-  document.querySelector("#before-count").textContent = report.before.summary.total;
-  document.querySelector("#after-count").textContent = report.after.summary.total;
-  document.querySelector("#before-bars").innerHTML = severityBars(report.before.summary);
-  document.querySelector("#after-bars").innerHTML = severityBars(report.after.summary);
-  document.querySelector("#improvement").textContent = `${report.delta.improvement}%`;
-  document.querySelector("#resolved").textContent = `${report.delta.resolved} findings resolved`;
-  document.querySelector("#diff-output").innerHTML = highlightDiff(report.diff);
-  document.querySelector("#duration").textContent = `Completed in ${(report.durationMs / 1000).toFixed(2)}s · ${report.source}`;
+  query("#before-total").textContent = String(report.before.summary.total);
+  query("#after-total").textContent = String(report.after.summary.total);
+  query("#before-count").textContent = String(report.before.summary.total);
+  query("#after-count").textContent = String(report.after.summary.total);
+  query<HTMLElement>("#before-bars").innerHTML = severityBars(report.before.summary);
+  query<HTMLElement>("#after-bars").innerHTML = severityBars(report.after.summary);
+  query("#improvement").textContent = `${report.delta.improvement}%`;
+  query("#resolved").textContent = `${report.delta.resolved} findings resolved`;
+  query<HTMLElement>("#diff-output").innerHTML = highlightDiff(report.diff);
+  query("#duration").textContent = `Completed in ${(report.durationMs / 1000).toFixed(2)}s · ${report.source}`;
   renderFindings();
   elements.report.hidden = false;
   elements.report.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function setLoading(loading) {
-  clearInterval(loaderTimer);
+function setLoading(loading: boolean): void {
+  if (loaderTimer) clearInterval(loaderTimer);
   elements.loader.hidden = !loading;
   if (!loading) return;
   const messages = ["Cloning repository…", "Running baseline audit…", "Applying safe fixes…", "Verifying improvements…"];
   let index = 0;
-  elements.loaderCopy.textContent = messages[index];
+  elements.loaderCopy.textContent = messages[index] ?? "Running analysis…";
   loaderTimer = setInterval(() => {
     index = Math.min(index + 1, messages.length - 1);
-    elements.loaderCopy.textContent = messages[index];
+    elements.loaderCopy.textContent = messages[index] ?? "Running analysis…";
   }, 1700);
 }
 
-async function requestReport(url, options) {
+async function requestReport(url: string, options?: RequestInit): Promise<void> {
   elements.notice.hidden = true;
   setLoading(true);
   try {
     const response = await fetch(url, options);
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "The report could not be generated.");
-    render(data);
-  } catch (error) {
-    elements.notice.textContent = error.message;
+    const data: unknown = await response.json();
+    if (!response.ok) {
+      const message = typeof data === "object" && data && "error" in data ? String(data.error) : "The report could not be generated.";
+      throw new Error(message);
+    }
+    render(data as Report);
+  } catch (error: unknown) {
+    elements.notice.textContent = error instanceof Error ? error.message : "The report could not be generated.";
     elements.notice.hidden = false;
   } finally {
     setLoading(false);
@@ -130,30 +141,32 @@ elements.form.addEventListener("submit", (event) => {
 });
 
 elements.demo.addEventListener("click", () => requestReport("/api/demo"));
-document.querySelectorAll("[data-repository]").forEach((button) => {
+document.querySelectorAll<HTMLButtonElement>("[data-repository]").forEach((button) => {
   button.addEventListener("click", () => {
-    elements.repository.value = button.dataset.repository;
+    const repository = button.dataset.repository;
+    if (!repository) return;
+    elements.repository.value = repository;
     requestReport("/api/analyze", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ repository: button.dataset.repository }),
+      body: JSON.stringify({ repository }),
     });
   });
 });
-document.querySelectorAll("[data-view]").forEach((button) => {
+document.querySelectorAll<HTMLButtonElement>("[data-view]").forEach((button) => {
   button.addEventListener("click", () => {
-    activeView = button.dataset.view;
+    activeView = button.dataset.view === "after" ? "after" : "before";
     renderFindings();
   });
 });
-document.querySelector("#copy-diff").addEventListener("click", async (event) => {
+query<HTMLButtonElement>("#copy-diff").addEventListener("click", async (event) => {
   await navigator.clipboard.writeText(report?.diff || "");
-  const button = event.currentTarget;
+  const button = event.currentTarget as HTMLButtonElement;
   const original = button.textContent;
   button.textContent = "Copied";
   setTimeout(() => { button.textContent = original; }, 1200);
 });
-document.querySelector("#download-report").addEventListener("click", () => {
+query<HTMLButtonElement>("#download-report").addEventListener("click", () => {
   if (!report) return;
   const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -163,7 +176,7 @@ document.querySelector("#download-report").addEventListener("click", () => {
   anchor.click();
   URL.revokeObjectURL(url);
 });
-document.querySelector("#print-report").addEventListener("click", () => window.print());
+query<HTMLButtonElement>("#print-report").addEventListener("click", () => window.print());
 
 if (new URLSearchParams(window.location.search).get("demo") === "1") {
   requestReport("/api/demo");

@@ -21,7 +21,7 @@ jobs:
           cache: npm
       - name: Run tests
         run: npm test
-      - name: Verify syntax
-        run: |
-          node --check server.js
-          node --check public/app.js
+      - name: Type-check source
+        run: npm run typecheck
+      - name: Build application
+        run: npm run build

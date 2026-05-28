@@ -1,3 +1,13 @@
+FROM node:22-bookworm-slim AS build
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY tsconfig.json tsconfig.server.json server.ts ./
+COPY src ./src
+COPY public ./public
+RUN npm run build
+
 FROM node:22-bookworm-slim
 
 ARG ZIZMOR_VERSION=1.30.1
@@ -9,9 +19,8 @@ RUN apt-get update \
 
 WORKDIR /app
 COPY package.json ./
-COPY server.js ./
-COPY src ./src
-COPY public ./public
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/public ./public
 
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
@@ -19,4 +28,4 @@ ENV NODE_ENV=production \
 
 USER node
 EXPOSE 4173
-CMD ["node", "server.js"]
+CMD ["node", "dist/server.js"]
