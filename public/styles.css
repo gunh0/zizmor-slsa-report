@@ -46,8 +46,12 @@ h1 em { font-family: Georgia, serif; font-weight: 400; }
 .text-button { border: 0; border-bottom: 1px solid currentColor; padding: 0 0 2px; background: none; color: var(--ink); cursor: pointer; font: 500 10px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
 .presets { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
 .presets > span { margin-right: 4px; color: var(--muted); font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
-.presets button { border: 1px solid var(--line); background: transparent; color: var(--ink); padding: 8px 11px; cursor: pointer; font: 10px var(--mono); transition: background .15s, border-color .15s, transform .15s; }
-.presets button:hover, .presets button:focus-visible { border-color: var(--ink); background: var(--acid); transform: translateY(-1px); outline: none; }
+.presets > div { display: flex; border: 1px solid var(--line); transition: border-color .15s, transform .15s; }
+.presets > div:hover, .presets > div:focus-within { border-color: var(--ink); transform: translateY(-1px); }
+.presets button, .presets a { border: 0; background: transparent; color: var(--ink); padding: 8px 10px; font: 10px var(--mono); text-decoration: none; }
+.presets button { cursor: pointer; }
+.presets a { border-left: 1px solid var(--line); color: var(--muted); }
+.presets button:hover, .presets button:focus-visible, .presets a:hover, .presets a:focus-visible { background: var(--acid); color: var(--ink); outline: none; }
 .notice { max-width: 850px; margin-top: 28px; padding: 14px 18px; border-left: 3px solid var(--red); background: #ffe7e1; font-size: 13px; }
 
 .report { padding: 80px 0 110px; border-top: 1px solid var(--line); }
