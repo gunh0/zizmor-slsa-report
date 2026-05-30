@@ -13,7 +13,7 @@ Prism turns [`zizmor`](https://github.com/zizmorcore/zizmor) findings into a com
 - Rule, confidence, file, and line for each finding
 - The Git diff produced by `zizmor --fix=safe`
 - A built-in example report when zizmor is not installed
-- One-click scans for five well-known open-source repositories
+- One-click scans for ten well-known open-source repositories, with direct GitHub links
 
 ## Requirements
 
@@ -42,7 +42,7 @@ PORT=8080 ZIZMOR_BIN=/opt/bin/zizmor npm start
 
 `MAX_CONCURRENT_ANALYSES` controls simultaneous scans and defaults to `2`.
 
-No npm dependencies or build step are required.
+The application is written in TypeScript. `npm start` performs a production build before starting the compiled server.
 
 ## Container
 
@@ -68,6 +68,8 @@ Only `github.com` public repository slugs and canonical HTTPS URLs are accepted.
 ```bash
 npm run dev
 npm test
+npm run typecheck
+npm run build
 ```
 
 Use the included Makefile to install the project-local zizmor binary and run development tasks:
