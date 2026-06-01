@@ -21,6 +21,7 @@ const elements = {
 let report: Report | null = null;
 let activeView: "before" | "after" = "before";
 let loaderTimer: ReturnType<typeof setInterval> | undefined;
+let scrollOnRender = true;
 
 function escapeHtml(value: unknown): string {
   return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
@@ -90,7 +91,8 @@ function render(nextReport: Report): void {
   query("#duration").textContent = `Completed in ${(report.durationMs / 1000).toFixed(2)}s · ${report.source}`;
   renderFindings();
   elements.report.hidden = false;
-  elements.report.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (scrollOnRender) elements.report.scrollIntoView({ behavior: "smooth", block: "start" });
+  scrollOnRender = true;
 }
 
 function setLoading(loading: boolean): void {
@@ -178,6 +180,17 @@ query<HTMLButtonElement>("#download-report").addEventListener("click", () => {
 });
 query<HTMLButtonElement>("#print-report").addEventListener("click", () => window.print());
 
-if (new URLSearchParams(window.location.search).get("demo") === "1") {
+const searchParams = new URLSearchParams(window.location.search);
+const requestedRepository = searchParams.get("repository");
+
+if (requestedRepository) {
+  scrollOnRender = false;
+  elements.repository.value = requestedRepository;
+  requestReport("/api/analyze", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ repository: requestedRepository }),
+  });
+} else if (searchParams.get("demo") === "1") {
   requestReport("/api/demo");
 }

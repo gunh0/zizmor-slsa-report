@@ -13,7 +13,7 @@ Prism turns [`zizmor`](https://github.com/zizmorcore/zizmor) findings into a com
 - Rule, confidence, file, and line for each finding
 - The Git diff produced by `zizmor --fix=safe`
 - A built-in example report when zizmor is not installed
-- One-click scans for ten well-known open-source repositories, with direct GitHub links
+- One-click scans for eight well-known open-source repositories, with direct GitHub links
 
 ## Requirements
 
