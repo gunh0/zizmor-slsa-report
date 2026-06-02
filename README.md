@@ -1,10 +1,10 @@
-# Prism — zizmor SLSA Report
+# zizmor Report
 
-Prism turns [`zizmor`](https://github.com/zizmorcore/zizmor) findings into a compact before-and-after security report. Give it a public GitHub repository: it runs a baseline audit, applies only zizmor's safe fixes in an isolated temporary clone, scans again, and shows the improvement and exact diff.
+zizmor Report turns [`zizmor`](https://github.com/zizmorcore/zizmor) findings into a compact before-and-after security report. Give it a public GitHub repository: it runs a baseline audit, applies only zizmor's safe fixes in an isolated temporary clone, scans again, and shows the improvement and exact diff.
 
-![Prism dashboard showing a before-and-after zizmor security report](docs/prism-dashboard.png)
+![zizmor Report dashboard showing a K3s before-and-after security analysis](docs/zizmor-report-dashboard.png)
 
-> Prism never pushes fixes to the target repository. Every scan uses a fresh, shallow clone that is deleted after the report is built.
+> zizmor Report never pushes fixes to the target repository. Every scan uses a fresh, shallow clone that is deleted after the report is built.
 
 ## What it shows
 
@@ -47,8 +47,8 @@ The application is written in TypeScript. `npm start` performs a production buil
 ## Container
 
 ```bash
-docker build -t prism-report .
-docker run --rm -p 4173:4173 prism-report
+docker build -t zizmor-report .
+docker run --rm -p 4173:4173 zizmor-report
 ```
 
 The application binds to loopback by default. Set `HOST=0.0.0.0` in a container or trusted deployment environment.
@@ -83,7 +83,7 @@ make docker-build
 make docker-run PORT=8080
 ```
 
-Prism consumes zizmor's versioned `json-v1` output. JSON rows are zero-based, so the report converts them to conventional one-based line numbers.
+zizmor Report consumes zizmor's versioned `json-v1` output. JSON rows are zero-based, so the report converts them to conventional one-based line numbers.
 
 ## License
 
